@@ -10,13 +10,13 @@
         "declaration": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "declarationDir": "dist/types",
         "outDir": "compiled",
         "typeRoots": [
             "node_modules/@types"
         ]
     },
     "include": [
-        "src"
-    ]
+        "."
+    ],
+    "exclude": []
 }
