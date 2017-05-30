@@ -26,7 +26,7 @@ export namespace FatSecret {
    }
 
    export interface APICallback {
-      (body: string): void;
+      (error: Error, body: string): void;
    }
 
    export class Client {
@@ -48,17 +48,11 @@ export namespace FatSecret {
          // build the oauth api url
          let apiUrl = this.buildUrl(apiMethod, params);
 
-         console.log("*** API URL = " + apiUrl);
-
          // invoke the http api call
-         request.get(apiUrl, (error, resp, body: string) => {
-            console.log("error: " + error);
-            console.log("resp: " + resp);
-            console.log("body: " + body);
-
+         request.get(apiUrl, (error: Error, resp, body: string) => {
             // return the response message body
             if (cb) {
-               cb(body);
+               cb(error, body);
             }
          });
       }
@@ -67,10 +61,6 @@ export namespace FatSecret {
          // get the oauth time parameters
          let ts: string = new Date().getTime().toString();
          let nonce: string = this.random(100000, 999999).toString();
-         //let ts = "1234567890"
-         //let nonce = "9876543210"
-         console.log("*** ts = " + ts);
-         console.log("*** nonce = " + nonce);
 
          // build the base message
          let msg: OAuthMessage = {
@@ -108,7 +98,6 @@ export namespace FatSecret {
          // generate the oauth sha base64 signature (no token key)
          let consumerSecret = process.env.FATSECRET_CONSUMER_SECRET
          let oauthSig = this.sign(consumerSecret, "", sigBase);
-         console.log("*** oauthSig = " + oauthSig);
 
          // add the oauth signature to the map
          msg["oauth_signature"] = oauthSig;
@@ -123,22 +112,15 @@ export namespace FatSecret {
          for (var key of oauthNames) {
             apiQuery += `&${key}=${this.sigEscape(msg[key])}`
          }
-         console.log("*** apiQuery before = " + apiQuery);
-         console.log("*** apiUrl before = " + apiUrl);
          apiUrl += apiQuery.substring(1, apiQuery.length);
-         console.log("*** apiUrl after = " + apiUrl);
 
          // return the api url
          return apiUrl;
       }
 
       private sign(consumerSecret: string, tokenSecret: string, msg: string): string {
-         console.log("*** tokenSecret = %s", tokenSecret)
-         console.log("*** msg = %s", msg)
-
          // generate the oauth sha1 base64 signature
          var key = `${consumerSecret}&${tokenSecret}`;
-         console.log("*** key = %s", key)
          var mac = crypto.createHmac('sha1', key);
          mac.setEncoding('base64');
          mac.write(msg);
@@ -153,7 +135,6 @@ export namespace FatSecret {
       private sigEscape(s: string): string {
          s = s.replace(/%7(e|E)/g, '~');
          s = encodeURIComponent(s);
-         s = s.replace(/%2(b|B)/g, '%20'); // convert plus back to space
          s = s.replace(/\!/g, '%21');
          s = s.replace(/\\/g, '%27');
          s = s.replace(/\(/g, '%28');

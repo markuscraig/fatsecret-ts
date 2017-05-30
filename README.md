@@ -7,6 +7,14 @@ You must set the following environment variables in order to access the FatSecre
 1. `"FATSECRET_CONSUMER_KEY"`
 2. `"FATSECRET_CONSUMER_SECRET"`
 
+## Run Examples
+
+```bash
+$ cd examples
+$ tsc -p .
+$ node compiled/examples/simple_call.js
+```
+
 ## References
 
 * https://platform.fatsecret.com/api/

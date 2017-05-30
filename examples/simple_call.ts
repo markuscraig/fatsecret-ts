@@ -8,14 +8,17 @@ let secret = process.env.FATSECRET_CONSUMER_SECRET;
 let client = new FatSecret.Client(key, secret);
 
 // invoke an api call
-/*
-let apiMethod = "food.search"
+let apiMethod = "foods.search"
 let apiParams: FatSecret.APIParams = {
    "search_expression": "coffee"
 };
-*/
-let apiMethod = "food_categories.get"
-let apiParams: FatSecret.APIParams = {};
-client.invokeAPI(apiMethod, apiParams, (body: string) => {
-   console.log("INVOKE API CALLBACK: body = " + body);
+
+client.invokeAPI(apiMethod, apiParams, (error: Error, body: string) => {
+   if (error) {
+      console.log(`\nError Occurred: ${error}`);
+      return;
+   }
+
+   // dump the json response body
+   console.log(body);
 });
